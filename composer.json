@@ -1,0 +1,17 @@
+{
+    "name": "serj/gym-back",
+    "description": "Backend para la aplicacion de GYM",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Serj\\GymAppBack\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sergio AM",
+            "email": "s.alvarez@monroy.dev"
+        }
+    ],
+    "require": {}
+}
