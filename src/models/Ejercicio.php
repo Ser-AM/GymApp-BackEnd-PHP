@@ -10,15 +10,15 @@ class Ejercicio {
         $this->pdo = $pdo;
     }
 
-    public function insertarEjercicio($nombre, $descripcion, $urlImagen, $orden, $activo) {
-        $sql = "INSERT INTO T006_EJERCICIOS (T_NOMBRE, T_DESCRIPCION, T_URL_IMAGEN, I_ORDEN, I_ACTIVO) VALUES (?, ?, ?, ?, ?)";
+    public function insertarEjercicio($nombre, $descripcion) {
+        $sql = "INSERT INTO T04_EJERCICIOS (T_NOMBRE, T_DESCRIPCION) VALUES (?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$nombre, $descripcion, $urlImagen, $orden, $activo]);
+        $stmt->execute([$nombre, $descripcion]);
         return $this->pdo->lastInsertId();
     }
 
     public function obtenerTodosEjercicios() {
-        $sql = "SELECT ID, T_NOMBRE, T_DESCRIPCION, T_URL_IMAGEN, I_ORDEN, I_ACTIVO FROM T006_EJERCICIOS ORDER BY I_ORDEN";
+        $sql = "SELECT ID, T_NOMBRE, T_DESCRIPCION FROM T04_EJERCICIOS";
         $stmt = $this->pdo->query($sql);
         $ejercicios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $ejercicios;
@@ -26,27 +26,24 @@ class Ejercicio {
     
 
     public function obtenerEjercicioPorId($id) {
-        $sql = "SELECT ID, T_NOMBRE, T_DESCRIPCION, T_URL_IMAGEN, I_ORDEN, I_ACTIVO FROM T006_EJERCICIOS WHERE ID = :id";
+        $sql = "SELECT ID, T_NOMBRE, T_DESCRIPCION FROM T04_EJERCICIOS WHERE ID = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function actualizarEjercicio($id, $nombre, $descripcion, $urlImagen, $orden, $activo) {
-        $sql = "UPDATE T006_EJERCICIOS SET T_NOMBRE = :nombre, T_DESCRIPCION = :descripcion, T_URL_IMAGEN = :urlImagen, I_ORDEN = :orden, I_ACTIVO = :activo WHERE ID = :id";
+    public function actualizarEjercicio($id, $nombre, $descripcion) {
+        $sql = "UPDATE T04_EJERCICIOS SET T_NOMBRE = :nombre, T_DESCRIPCION = :descripcion WHERE ID = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':urlImagen', $urlImagen);
-        $stmt->bindParam(':orden', $orden, PDO::PARAM_INT);
-        $stmt->bindParam(':activo', $activo, PDO::PARAM_BOOL);
         $stmt->execute();
     }
 
     public function eliminarEjercicio($id) {
-        $sql = "DELETE FROM T006_EJERCICIOS WHERE ID = :id";
+        $sql = "DELETE FROM T04_EJERCICIOS WHERE ID = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();

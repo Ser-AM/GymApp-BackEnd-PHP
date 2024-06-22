@@ -21,10 +21,14 @@ $ejercicioModel = new Ejercicio($pdo);
 $ejercicioController = new EjercicioController($ejercicioModel);
 
 // Definir las rutas
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_GET['action'] == 'insertar') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_GET['action'] == 'insertarEjercicio') {
     $data = json_decode(file_get_contents('php://input'), true);
+    if ($data === null) {
+        echo json_encode(['status' => 'error', 'message' => 'Datos inválidos.']);
+        exit;
+    }
     try {
-        $id = $ejercicioController->insertarEjercicio($data['nombre'], $data['descripcion'], $data['urlImagen'], $data['orden'], $data['activo']);
+        $id = $ejercicioController->insertarEjercicio($data['nombre'], $data['descripcion']);
         echo json_encode(['status' => 'success', 'id' => $id]);
     } catch (Exception $e) {
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -32,24 +36,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_GET['action'] == 'insertar') {
 } elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && $_GET['action'] == 'obtenerTodos') {
     $ejercicios = $ejercicioController->obtenerTodosEjercicios();
     echo json_encode($ejercicios);
-} elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && $_GET['action'] == 'obtener' && isset($_GET['id'])) {
-    $ejercicio = $ejercicioController->obtenerEjercicioPorId($_GET['id']);
-    echo json_encode($ejercicio);
-} elseif ($_SERVER['REQUEST_METHOD'] == 'PUT' && $_GET['action'] == 'actualizar' && isset($_GET['id'])) {
+}elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && $_GET['action'] == 'obtenerEjercicio' && isset($_GET['id'])) {
+    $id = $_GET['id'];
+    try {
+        $ejercicio = $ejercicioController->obtenerEjercicioPorId($id);
+        if ($ejercicio) {
+            echo json_encode(['status' => 'success', 'ejercicio' => $ejercicio]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Ejercicio no encontrado.']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] == 'PUT' && $_GET['action'] == 'actualizarEjercicio' && isset($_GET['id'])) {
+    $id = $_GET['id'];
     $data = json_decode(file_get_contents('php://input'), true);
     try {
-        $ejercicioController->actualizarEjercicio($_GET['id'], $data['nombre'], $data['descripcion'], $data['urlImagen'], $data['orden'], $data['activo']);
+        $ejercicioController->actualizarEjercicio($id, $data['nombre'], $data['descripcion']);
         echo json_encode(['status' => 'success']);
     } catch (Exception $e) {
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
-} elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE' && $_GET['action'] == 'eliminar' && isset($_GET['id'])) {
-    try {
-        $ejercicioController->eliminarEjercicio($_GET['id']);
-        echo json_encode(['status' => 'success']);
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+} elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE' && $_GET['action'] == 'eliminarEjercicio') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (isset($data['id'])) {
+        $id = $data['id'];
+        try {
+            $ejercicioController->eliminarEjercicio($id);
+            echo json_encode(['status' => 'success']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
     }
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
 }
